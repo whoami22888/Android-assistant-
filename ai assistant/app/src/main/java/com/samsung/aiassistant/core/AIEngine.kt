@@ -242,8 +242,8 @@ class AIEngine(private val context: Context) {
     
     suspend fun getMemoryLog(): List<MemoryEntry> {
         return withContext(Dispatchers.IO) {
-            database.memoryDao().getAllMemories()
-        }.kotlinx.coroutines.flow.first()
+            kotlinx.coroutines.flow.first(database.memoryDao().getAllMemories())
+        }
     }
     
     suspend fun getConversationHistory(limit: Int = 50): List<ConversationEntry> {
