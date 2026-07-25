@@ -20,6 +20,20 @@ The planner has a hard **four-step** execution limit. It records only concise ta
 
 Prepare a Docker-capable host and a DNS name that resolves to it. The Android client requires HTTPS, including when the gateway is reachable through a private mesh endpoint.
 
+### Automated Docker setup
+
+Use `setup-docker.sh` to create or preserve `.env`, generate missing pairing secrets, optionally prepare `Caddyfile`, start the selected Compose profile, and wait for the gateway health endpoint.
+
+```bash
+# Gateway only; useful for local verification or when a private HTTPS mesh endpoint is supplied separately.
+./setup-docker.sh --mode local
+
+# Gateway plus Caddy TLS; DNS for the domain must point to this host and ports 80/443 must be reachable.
+./setup-docker.sh --mode tls --domain agent.example.com
+```
+
+The script prints the one-time pairing code at the end. It preserves existing non-placeholder values in `.env`; use `--no-start` to generate configuration without starting containers, or `--dry-run` to print the Compose command. Provider keys may be passed as environment variables, for example `GROQ_API_KEY=... ./setup-docker.sh --mode tls --domain agent.example.com`.
+
 ```bash
 cd Android-assistant-
 cp .env.example .env
@@ -102,6 +116,7 @@ android-agent/             Native Kotlin / Compose app
 backend/                   FastAPI gateway, model router, SQLite store, browser and analysis tools
 docs/                      Android and backend security design notes
 docker-compose.yml         Gateway, optional TLS proxy, optional Android compiler
+setup-docker.sh            Non-interactive Docker configuration, start, and health verification
 Caddyfile.example          TLS edge template
 .env.example               Non-secret configuration template
 ```
