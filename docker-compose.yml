@@ -1,0 +1,67 @@
+services:
+  agent-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${AGENT_PORT:-8080}:8080"
+    volumes:
+      - agent_data:/data
+      - agent_workspace:/workspace
+    read_only: true
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,size=128m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    shm_size: 512mb
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.50"
+          memory: 1536M
+
+  # Optional TLS edge. Copy Caddyfile.example to Caddyfile and set a real hostname before enabling.
+  caddy:
+    image: caddy:2.8-alpine
+    profiles: ["tls"]
+    depends_on:
+      agent-api:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+
+  # Optional, on-demand Android compiler. It never starts with `up`.
+  android-build:
+    profiles: ["android-build"]
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.android-builder
+    working_dir: /workspace/android-agent
+    volumes:
+      - ./:/workspace:rw
+      - gradle_cache:/home/gradle/.gradle
+    entrypoint: ["gradle"]
+
+volumes:
+  agent_data:
+  agent_workspace:
+  gradle_cache:
+  caddy_data:
+  caddy_config:

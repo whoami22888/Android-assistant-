@@ -1,0 +1,6 @@
+# Replace agent.example.com with a DNS name that resolves to this host.
+# Caddy obtains and renews a public TLS certificate when ports 80 and 443 are reachable.
+agent.example.com {
+    encode zstd gzip
+    reverse_proxy agent-api:8080
+}

@@ -31,3 +31,13 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# Agent gateway secrets and state
+.env
+backend/.pytest_cache/
+backend/__pycache__/
+backend/app/__pycache__/
+*.db
+android-agent/.gradle/
+android-agent/build/
+android-agent/app/build/
