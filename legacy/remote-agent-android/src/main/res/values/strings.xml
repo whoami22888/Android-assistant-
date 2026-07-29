@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Remote Agent</string>
+    <string name="accessibility_service_label">Remote Agent automation</string>
+    <string name="accessibility_service_description">Performs only actions you approve inside Remote Agent. It does not record keystrokes or continuously collect screen content.</string>
+    <string name="capture_channel_name">Screen capture</string>
+    <string name="capture_notification_title">Screen capture is active</string>
+    <string name="capture_notification_text">Remote Agent can capture a frame only when you request it.</string>
+</resources>

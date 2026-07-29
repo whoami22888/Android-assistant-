@@ -1,0 +1,17 @@
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): true
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Signer #1 certificate DN: CN=S23 Media Vault, OU=Private Media, O=Owner, C=AU
+Signer #1 certificate SHA-256 digest: ca305c0f2d3275e414849b19284fbc51d6b7e926fac6797e99c2456d1ec5eb2b
+Signer #1 certificate SHA-1 digest: a97e5d3597bda1139c8c046136dc4dbad7539b6a
+Signer #1 certificate MD5 digest: 950886e5143d02c3cec0b60f7c4ca3dc
+Signer #1 key algorithm: RSA
+Signer #1 key size (bits): 4096
+Signer #1 public key SHA-256 digest: 88afd75f843cc4d49f49a19f7a1789183468ed27df945f6c7f75753e3d5c00b2
+Signer #1 public key SHA-1 digest: be5e690c792239a018a1273ba3714005695cc4dd
+Signer #1 public key MD5 digest: 0867865afe69afdd49063175fd0ba624

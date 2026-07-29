@@ -41,3 +41,8 @@ backend/app/__pycache__/
 android-agent/.gradle/
 android-agent/build/
 android-agent/app/build/
+
+# Generated S23 Media Vault release artifacts (kept out of source control)
+dist/*.apk
+dist/*.apk.idsig
+dist/*-source.zip
