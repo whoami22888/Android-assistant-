@@ -1,27 +1,7 @@
-# Macaw Rescue Fieldbook v6 — Android APK source
+# Macaw Rescue AI v2 — offline SmolVLM2
 
-Native Android Java WebView host for the **offline** manual-observation fieldbook. Bundles v1/v3/v4/v5 research excerpts and the v6 individual-learning supplement; no cloud AI, background camera, mini-PC or network connection needed. Package `au.com.macawrescue.fieldbook`. `minSdk=26`, `targetSdk=35`.
+This is an Android ARM64 APK integrating SceneSense v1.3's AGPL JNI runtime into the Macaw Fieldbook offline UI. `INTERNET` is used **only** for explicit first-use model download from Hugging Face (model ~437MB; projector ~109MB, both SHA-256 verified). Afterward image/video inference runs on-device using `libvisionai.so` llama.cpp native backend. No private user media leaves the device.
 
-Features: manual photo/video chooser; video seeking, screenshot export, timestamped ABC logging; local bird profile, training, rewards, welfare history; human corrections with preserved prior revisions; first-confirmed-warning summaries; BORIS CSV export/import; JSON backup/restore; on-device reference search. Media is not retained as part of backup.
+How to use: install APK, open `AI Analysis`, tap `Download offline model` with sufficient storage and Wi-Fi, select a photo or short video, then `Analyse on device`. AI output remains pending until explicitly confirmed. Video samples three frames (early/middle/late), so brief warning gestures can be missed. The offline rule-based recommendations are conservative and not medical diagnostics. Keep records backed up.
 
-The full v6 FastAPI/Gemini/99-chunk SQLite server remains a separate optional package; this APK does NOT execute Python, run auto video inference, or fetch research automatically. When analysis is needed, attach the clip to ChatGPT manually and use the built-in prompt, or deploy the separate v6 server.
-
-## Build
-
-From `macaw_apk/` with Android SDK platform 35, Java 17 and Gradle 8.10.2 installed:
-
-    gradle --no-daemon :app:assembleDebug
-
-APK: `app/build/outputs/apk/debug/app-debug.apk` (debug-signed, sideload only).
-
-## Privacy / data
-
-Zero Android permissions requested. Document selection and saving use Android system pickers. Data is stored in Android WebView origin storage, and can be lost if the application is uninstalled or its data cleared. Export JSON backups regularly. The native JavaScript export bridge is only usable in the bundled `appassets.androidplatform.net` page; external links open the system browser.
-
-## Limitations
-
-- Android 16 physical device smoke test not yet recorded.
-- WebView media codec support follows system capabilities; videos not decodable on the device cannot be annotated.
-- The first warning and session comparisons summarize only **human-confirmed entered data**, not hidden psychological state.
-- The APK does not include a medically validated welfare scoring tool.
-- BORIS Android app is independent; the APK exports/imports BORIS-style CSV, not the BORIS software itself.
+Build uses GitHub Actions to fetch a pinned official upstream release and extract its ARM64 native libraries. See THIRD_PARTY.md for licence and provenance. APK is debug-signed. Device end-to-end inference requires testing on an ARM64 phone after model download. No cloud service or home server required.
