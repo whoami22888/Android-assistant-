@@ -1,0 +1,65 @@
+name: Macaw Rescue Offline SmolVLM2 APK
+on:
+  push:
+    branches: [build/macaw-rescue-smolvlm2-v2]
+    paths: ['macaw_apk/**', '.github/workflows/macaw-rescue-smolvlm2-apk.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+      - name: Install Android SDK
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Obtain exact licensed native inference engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 4 --connect-timeout 20 \
+            -o /tmp/SceneSense-v1.3.apk \
+            https://github.com/AlbertoEJ/SceneSense/releases/download/v1.3/app-release.apk
+          echo '37c8df6622da4081c9c863c7bb9ce7f37c0679ff47b9aa58b7ae86cda3ed485c  /tmp/SceneSense-v1.3.apk' | sha256sum -c -
+          unzip -Z1 /tmp/SceneSense-v1.3.apk | grep -E '^lib/arm64-v8a/.*\.so$' | tee /tmp/macaw-native-files.txt
+          grep -q '^lib/arm64-v8a/libvisionai.so$' /tmp/macaw-native-files.txt
+          mkdir -p macaw_apk/app/src/main/jniLibs/arm64-v8a
+          unzip -j -o /tmp/SceneSense-v1.3.apk 'lib/arm64-v8a/*.so' -d macaw_apk/app/src/main/jniLibs/arm64-v8a/
+          test -s macaw_apk/app/src/main/jniLibs/arm64-v8a/libvisionai.so
+      - name: Check offline UI scripts
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('macaw_apk/app/src/main/assets/index.html').read_text()
+          assert 'MacawVision.analyze' in s and 'macawVisionNative' in s
+          for i,script in enumerate(re.findall(r'<script(?:[^>]*)>(.*?)</script>',s,re.S)):
+              if i: Path(f'/tmp/macaw-script-{i}.js').write_text(script)
+          PY
+          for f in /tmp/macaw-script-*.js; do node --check "$f"; done
+      - name: Build Android ARM64 APK
+        working-directory: macaw_apk
+        run: gradle --no-daemon :app:assembleDebug
+      - name: Verify APK
+        run: |
+          set -euo pipefail
+          APK=macaw_apk/app/build/outputs/apk/debug/app-debug.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | head -8
+          unzip -Z1 "$APK" | grep 'lib/arm64-v8a/libvisionai.so'
+          sha256sum "$APK"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Macaw-Rescue-SmolVLM2-Offline-APK-v2
+          path: macaw_apk/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
