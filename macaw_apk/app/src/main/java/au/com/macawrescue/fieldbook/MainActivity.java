@@ -24,6 +24,7 @@ public final class MainActivity extends Activity {
     private static final int SAVE_DOCUMENT = 1002;
     private static final String HOME = "https://appassets.androidplatform.net/index.html";
     private WebView webView;
+    private LocalVision vision;
     private ValueCallback<Uri[]> chooserCallback;
     private byte[] pendingData;
     private String pendingMime;
@@ -42,6 +43,8 @@ public final class MainActivity extends Activity {
         ws.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         ws.setSavePassword(false);
         webView.addJavascriptInterface(new FileExports(), "MacawNative");
+        vision=new LocalVision(this,webView);
+        webView.addJavascriptInterface(vision, "MacawVision");
         webView.setWebViewClient(new WebViewClient() {
             @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 Uri u = request.getUrl();
@@ -123,6 +126,7 @@ public final class MainActivity extends Activity {
     }
     @Override protected void onDestroy() {
         if (chooserCallback != null) { chooserCallback.onReceiveValue(null); chooserCallback = null; }
+        if (vision != null) vision.shutdown();
         if (webView != null) webView.destroy();
         super.onDestroy();
     }
