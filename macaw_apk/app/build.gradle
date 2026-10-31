@@ -1,0 +1,13 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'au.com.macawrescue.fieldbook'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'au.com.macawrescue.fieldbook'
+        minSdk 26
+        targetSdk 35
+        versionCode 1
+        versionName '1.0.0'
+    }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}
