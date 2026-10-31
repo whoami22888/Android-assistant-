@@ -3,7 +3,7 @@ android {
     namespace 'au.com.macawrescue.fieldbook'
     compileSdk 35
     defaultConfig {
-        applicationId 'au.com.macawrescue.fieldbook'
+        applicationId 'au.com.macawrescue.fieldbook.ai'
         minSdk 29
         targetSdk 35
         versionCode 2
