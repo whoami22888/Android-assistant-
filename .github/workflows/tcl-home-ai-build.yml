@@ -19,7 +19,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
@@ -28,10 +27,13 @@ jobs:
           echo '2b49aaccd808e49fc51717c184e29508ca29e596c39bf4a0ade3cdee412ec998  tcl-home-ai/build-src.tar.xz' | sha256sum -c -
           mkdir -p tcl-home-ai/extracted
           tar -xJf tcl-home-ai/build-src.tar.xz -C tcl-home-ai/extracted
-      - name: Install SDK 35
+      - name: Ensure Android SDK 35
         run: |
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+          echo "ANDROID_HOME: ${ANDROID_HOME:-unset}"
+          SDKMANAGER="$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}/cmdline-tools" -type f -path '*/bin/sdkmanager' | sort -V | tail -1)"
+          test -x "$SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
       - name: Compile debug APK
         working-directory: tcl-home-ai/extracted/tcl-tv-assistant
         run: gradle :app:assembleDebug --stacktrace --no-daemon
