@@ -42,6 +42,11 @@ jobs:
           test -s tcl-home-ai/extracted/tcl-tv-assistant/app/build/outputs/apk/debug/app-debug.apk
           unzip -t tcl-home-ai/extracted/tcl-tv-assistant/app/build/outputs/apk/debug/app-debug.apk | tail -1
           sha256sum tcl-home-ai/extracted/tcl-tv-assistant/app/build/outputs/apk/debug/app-debug.apk
+      - name: Verify Android signature and manifest compatibility
+        run: |
+          APK="tcl-home-ai/extracted/tcl-tv-assistant/app/build/outputs/apk/debug/app-debug.apk"
+          "${ANDROID_HOME}/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK"
+          "${ANDROID_HOME}/build-tools/35.0.0/aapt" dump badging "$APK" | grep -E '^package:|^sdkVersion:|^targetSdkVersion:'
       - uses: actions/upload-artifact@v4
         if: success()
         with:
